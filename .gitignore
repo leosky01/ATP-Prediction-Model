@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Trained models (large binary files, regenerate via training)
+models/*.pt
+models/*.pth
+models/*.joblib
+models/*.pkl
+models/*.cbm
+
+# Compressed data
+*.csv.gz
+*.parquet
+*.feather
+
+# Temporary / generated
+*.tmp
+*.log
+*.out
+.mypy_cache/
+.pytest_cache/
