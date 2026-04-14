@@ -164,8 +164,8 @@ The blend mode also computes:
 
 ## Important Notes
 
-- The current training uses a **random train/test split**. Real-world accuracy with proper time-based validation is lower (~67-68%).
-- Betting odds are highly efficient — ML predictions alone are **not sufficient for profitable betting**.
+- The current training uses a **random train/test split**. 
+- Betting odds are highly efficient.
 - Model artifacts in `models/` are git-ignored and must be regenerated via training.
 
 ## Requirements
