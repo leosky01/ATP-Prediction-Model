@@ -76,14 +76,15 @@ THUMB_HEIGHT = 720
 TTS_VOICE = "it-IT-ElsaNeural"
 TTS_RATE = "-5%"
 
-# Dark theme colours
+# Dark theme colours — vivid, high contrast for video
 BG_COLOR = "#0D1117"
-TEXT_COLOR = "#E6EDF3"
-P1_COLOR = "#58A6FF"       # blue
-P2_COLOR = "#F85149"       # red
-WINNER_COLOR = "#3FB950"   # green
-ACCENT_COLOR = "#D2A8FF"   # purple accent
-GRID_COLOR = "#21262D"
+TEXT_COLOR = "#FFFFFF"
+P1_COLOR = "#4FC3F7"       # bright cyan-blue
+P2_COLOR = "#FF5252"       # vivid red
+WINNER_COLOR = "#69F0AE"   # bright green
+ACCENT_COLOR = "#CE93D8"   # bright purple accent
+GRID_COLOR = "#1E2733"
+HIGHLIGHT_BG = "#162032"   # subtle row highlight
 
 # Section durations (seconds) – used for narration timing
 SECTION_DURATIONS = {

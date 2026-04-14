@@ -36,17 +36,18 @@ plt.rcParams.update({
     "ytick.color": TEXT_COLOR,
     "grid.color": GRID_COLOR,
     "font.family": "sans-serif",
-    "font.size": 14,
+    "font.size": 18,
+    "font.weight": "bold",
 })
 
-DPI = 100
-FIG_W = VIDEO_WIDTH / DPI   # 19.2
-FIG_H = VIDEO_HEIGHT / DPI  # 10.8
+DPI = 120
+FIG_W = VIDEO_WIDTH / DPI   # 16
+FIG_H = VIDEO_HEIGHT / DPI  # 9
 
 
 def _save(fig: plt.Figure, path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(str(path), dpi=DPI, bbox_inches="tight", pad_inches=0.3,
+    fig.savefig(str(path), dpi=DPI, bbox_inches="tight", pad_inches=0.1,
                 facecolor=fig.get_facecolor())
     plt.close(fig)
     return path
@@ -72,31 +73,31 @@ def match_prediction_card(
     ax.axis("off")
 
     # Tournament / surface header
-    ax.text(5, 5.5, tournament, fontsize=28, fontweight="bold",
+    ax.text(5, 5.5, tournament, fontsize=34, fontweight="bold",
             ha="center", va="center", color=ACCENT_COLOR)
-    ax.text(5, 5.0, f"Superficie: {surface}", fontsize=16,
+    ax.text(5, 5.0, f"Superficie: {surface}", fontsize=20,
             ha="center", va="center", color=TEXT_COLOR, alpha=0.7)
 
     # Player 1 (left)
     p1_color = WINNER_COLOR if winner == p1_name else P1_COLOR
-    ax.text(2.2, 3.8, p1_name, fontsize=30, fontweight="bold",
+    ax.text(2.2, 3.8, p1_name, fontsize=38, fontweight="bold",
             ha="center", va="center", color=p1_color)
-    ax.text(2.2, 3.1, f"Rank #{rank1}", fontsize=20,
+    ax.text(2.2, 3.1, f"Rank #{rank1}", fontsize=24,
             ha="center", va="center", color=TEXT_COLOR, alpha=0.8)
-    ax.text(2.2, 2.5, f"{prob_p1:.0%}", fontsize=44, fontweight="bold",
+    ax.text(2.2, 2.5, f"{prob_p1:.0%}", fontsize=54, fontweight="bold",
             ha="center", va="center", color=p1_color)
 
     # VS
-    ax.text(5, 3.2, "VS", fontsize=36, fontweight="bold",
-            ha="center", va="center", color=TEXT_COLOR, alpha=0.5)
+    ax.text(5, 3.2, "VS", fontsize=44, fontweight="bold",
+            ha="center", va="center", color=TEXT_COLOR, alpha=0.4)
 
     # Player 2 (right)
     p2_color = WINNER_COLOR if winner == p2_name else P2_COLOR
-    ax.text(7.8, 3.8, p2_name, fontsize=30, fontweight="bold",
+    ax.text(7.8, 3.8, p2_name, fontsize=38, fontweight="bold",
             ha="center", va="center", color=p2_color)
-    ax.text(7.8, 3.1, f"Rank #{rank2}", fontsize=20,
+    ax.text(7.8, 3.1, f"Rank #{rank2}", fontsize=24,
             ha="center", va="center", color=TEXT_COLOR, alpha=0.8)
-    ax.text(7.8, 2.5, f"{prob_p2:.0%}", fontsize=44, fontweight="bold",
+    ax.text(7.8, 2.5, f"{prob_p2:.0%}", fontsize=54, fontweight="bold",
             ha="center", va="center", color=p2_color)
 
     # Probability bar
@@ -116,23 +117,23 @@ def match_prediction_card(
                                 facecolor=p1_color, edgecolor="none", alpha=0.85))
 
     ax.text(bar_x + bar_w * p1_frac / 2, bar_y + bar_h / 2,
-            f"{prob_p1:.0%}", fontsize=16, fontweight="bold",
+            f"{prob_p1:.0%}", fontsize=20, fontweight="bold",
             ha="center", va="center", color="white")
     ax.text(bar_x + bar_w * (1 + p1_frac) / 2, bar_y + bar_h / 2,
-            f"{prob_p2:.0%}", fontsize=16, fontweight="bold",
+            f"{prob_p2:.0%}", fontsize=20, fontweight="bold",
             ha="center", va="center", color="white")
 
     # Confidence badge
     conf_color = WINNER_COLOR if confidence > 0.6 else "#E3B341" if confidence > 0.35 else P2_COLOR
-    ax.text(5, 0.5, f"Confidenza: {confidence:.0%}", fontsize=20,
+    ax.text(5, 0.5, f"Confidenza: {confidence:.0%}", fontsize=26,
             fontweight="bold", ha="center", va="center", color=conf_color)
 
     # Winner announcement
     if winner:
-        ax.text(5, 4.6, f"Predizione: {winner}", fontsize=22,
+        ax.text(5, 4.6, f"Predizione: {winner}", fontsize=28,
                 fontweight="bold", ha="center", va="center", color=WINNER_COLOR,
                 bbox=dict(boxstyle="round,pad=0.3", facecolor=BG_COLOR,
-                          edgecolor=WINNER_COLOR, linewidth=2, alpha=0.9))
+                          edgecolor=WINNER_COLOR, linewidth=3, alpha=0.9))
 
     save_path = save_path or TEMP_DIR / "01_prediction_card.png"
     return _save(fig, save_path)
@@ -161,7 +162,7 @@ def feature_contribution_circles(
     ax.set_aspect("equal")
     ax.axis("off")
 
-    ax.text(0, 1.6, "Analisi Feature per Feature", fontsize=28,
+    ax.text(0, 1.6, "Analisi Feature per Feature", fontsize=34,
             fontweight="bold", ha="center", va="center", color=TEXT_COLOR)
 
     # Separate features by direction
@@ -223,14 +224,14 @@ def feature_contribution_circles(
                                 linewidth=1.5, alpha=alpha))
             # Label
             label = FEATURE_LABELS_IT.get(key, key)
-            ax.text(cx, cy, label, fontsize=11, fontweight="bold",
+            ax.text(cx, cy, label, fontsize=14, fontweight="bold",
                     ha="center", va="center", color="white")
 
     # P1 / P2 labels
-    ax.text(-1.8, -1.5, "P1", fontsize=24, fontweight="bold",
-            ha="center", va="center", color=P1_COLOR, alpha=0.6)
-    ax.text(1.8, -1.5, "P2", fontsize=24, fontweight="bold",
-            ha="center", va="center", color=P2_COLOR, alpha=0.6)
+    ax.text(-1.8, -1.5, "P1", fontsize=28, fontweight="bold",
+            ha="center", va="center", color=P1_COLOR, alpha=0.7)
+    ax.text(1.8, -1.5, "P2", fontsize=28, fontweight="bold",
+            ha="center", va="center", color=P2_COLOR, alpha=0.7)
 
     save_path = save_path or TEMP_DIR / "02_feature_circles.png"
     return _save(fig, save_path)
@@ -276,24 +277,24 @@ def player_comparison_bars(
 
     # Labels
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(labels, fontsize=18, fontweight="bold")
+    ax.set_yticklabels(labels, fontsize=24, fontweight="bold")
     ax.set_xlim(-1.1, 1.1)
-    ax.axvline(0, color=TEXT_COLOR, linewidth=1.5, alpha=0.5)
+    ax.axvline(0, color=TEXT_COLOR, linewidth=2, alpha=0.5)
 
     # Value annotations
     for i in range(n):
         ax.text(-p1_vals[i] - 0.03, i, f"{p1_vals[i]:.0%}",
-                fontsize=14, ha="right", va="center", color=P1_COLOR, fontweight="bold")
+                fontsize=18, ha="right", va="center", color=P1_COLOR, fontweight="bold")
         ax.text(p2_vals[i] + 0.03, i, f"{p2_vals[i]:.0%}",
-                fontsize=14, ha="left", va="center", color=P2_COLOR, fontweight="bold")
+                fontsize=18, ha="left", va="center", color=P2_COLOR, fontweight="bold")
 
     # Player headers
-    ax.text(-0.55, n + 0.3, p1_name, fontsize=22, fontweight="bold",
+    ax.text(-0.55, n + 0.3, p1_name, fontsize=28, fontweight="bold",
             ha="center", va="center", color=P1_COLOR)
-    ax.text(0.55, n + 0.3, p2_name, fontsize=22, fontweight="bold",
+    ax.text(0.55, n + 0.3, p2_name, fontsize=28, fontweight="bold",
             ha="center", va="center", color=P2_COLOR)
 
-    ax.set_title("Confronto Giocatori", fontsize=28, fontweight="bold",
+    ax.set_title("Confronto Giocatori", fontsize=34, fontweight="bold",
                  color=TEXT_COLOR, pad=40)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -335,17 +336,17 @@ def confidence_upset_gauge(
                 linewidth=20, solid_capstyle="round", alpha=0.9)
 
         # Value text
-        ax.text(0, 0.35, label_fmt.format(value), fontsize=48, fontweight="bold",
+        ax.text(0, 0.35, label_fmt.format(value), fontsize=56, fontweight="bold",
                 ha="center", va="center", color=color)
-        ax.text(0, -0.15, title, fontsize=22, fontweight="bold",
+        ax.text(0, -0.15, title, fontsize=26, fontweight="bold",
                 ha="center", va="center", color=TEXT_COLOR)
 
     _draw_gauge(ax1, confidence, "Confidenza Modello",
                 WINNER_COLOR, "#E3B341")
-    _draw_gauge(ax2, upset_prob, "Probabilita Upset",
+    _draw_gauge(ax2, upset_prob, "Probabilità Upset",
                 P2_COLOR, "#E3B341")
 
-    fig.suptitle("Affidabilita e Sorpresa", fontsize=28,
+    fig.suptitle("Affidabilità e Sorpresa", fontsize=34,
                  fontweight="bold", color=TEXT_COLOR, y=0.92)
 
     save_path = save_path or TEMP_DIR / "04_confidence_gauge.png"
@@ -383,15 +384,14 @@ def model_breakdown(
     # Annotations
     for i, (prob, color) in enumerate(zip(probs, colors)):
         ax.text(prob + 0.02, i, f"{prob:.1%}",
-                fontsize=22, fontweight="bold", ha="left", va="center", color=color)
-        # Also show P(P2) on the right
+                fontsize=26, fontweight="bold", ha="left", va="center", color=color)
         ax.text(0.98, i, f"P2: {1 - prob:.1%}",
-                fontsize=14, ha="right", va="center", color=TEXT_COLOR, alpha=0.5)
+                fontsize=16, ha="right", va="center", color=TEXT_COLOR, alpha=0.5)
 
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(models, fontsize=20, fontweight="bold")
+    ax.set_yticklabels(models, fontsize=26, fontweight="bold")
     ax.set_xlim(0, 1.1)
-    ax.set_title(f"Analisi Modelli — P({p1_name})", fontsize=28,
+    ax.set_title(f"Analisi Modelli — P({p1_name})", fontsize=34,
                  fontweight="bold", color=TEXT_COLOR, pad=25)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -401,8 +401,8 @@ def model_breakdown(
 
     # Alpha visualisation inset
     ax.text(0.5, -0.7,
-            f"MLP x {alpha:.0%}  +  Elo x {1 - alpha:.0%}  =  Blend",
-            fontsize=18, ha="center", va="center", color=TEXT_COLOR, alpha=0.7,
+            f"MLP × {alpha:.0%}  +  Elo × {1 - alpha:.0%}  =  Blend",
+            fontsize=22, ha="center", va="center", color=TEXT_COLOR, alpha=0.7,
             transform=ax.get_yaxis_transform())
 
     save_path = save_path or TEMP_DIR / "05_model_breakdown.png"
@@ -442,14 +442,14 @@ def elo_trend(
                 marker="o", markersize=4, markerfacecolor=P1_COLOR, alpha=0.9)
         # End label
         ax.annotate(f"{p1_elos[-1]:.0f}", (dates1[-1], p1_elos[-1]),
-                    fontsize=14, fontweight="bold", color=P1_COLOR,
+                    fontsize=18, fontweight="bold", color=P1_COLOR,
                     xytext=(10, 0), textcoords="offset points", va="center")
 
     if len(dates2) > 0:
         ax.plot(dates2, p2_elos, color=P2_COLOR, linewidth=2.5, label=p2_name,
                 marker="o", markersize=4, markerfacecolor=P2_COLOR, alpha=0.9)
         ax.annotate(f"{p2_elos[-1]:.0f}", (dates2[-1], p2_elos[-1]),
-                    fontsize=14, fontweight="bold", color=P2_COLOR,
+                    fontsize=18, fontweight="bold", color=P2_COLOR,
                     xytext=(10, 0), textcoords="offset points", va="center")
 
     # Cross point highlight
@@ -461,10 +461,10 @@ def elo_trend(
                 ax.axvline(dates1[i] if i < len(dates1) else dates1[-1],
                            color=ACCENT_COLOR, linestyle="--", alpha=0.4, linewidth=1)
 
-    ax.set_title(f"Andamento Elo — {surface}", fontsize=28, fontweight="bold",
+    ax.set_title(f"Andamento Elo — {surface}", fontsize=34, fontweight="bold",
                  color=TEXT_COLOR, pad=20)
-    ax.set_ylabel("Elo Rating", fontsize=16, fontweight="bold", color=TEXT_COLOR)
-    ax.legend(fontsize=18, loc="upper left", facecolor=BG_COLOR,
+    ax.set_ylabel("Elo Rating", fontsize=20, fontweight="bold", color=TEXT_COLOR)
+    ax.legend(fontsize=22, loc="upper left", facecolor=BG_COLOR,
               edgecolor=GRID_COLOR, labelcolor=TEXT_COLOR)
 
     ax.spines["top"].set_visible(False)
@@ -497,7 +497,7 @@ def last_10_matches(
         ax.set_ylim(-1.0, 1.8)
         ax.axis("off")
 
-        ax.text(4.5, 1.55, player_name, fontsize=22, fontweight="bold",
+        ax.text(4.5, 1.55, player_name, fontsize=28, fontweight="bold",
                 ha="center", va="center", color=TEXT_COLOR)
 
         for i, r in enumerate(results[:10]):
@@ -509,23 +509,23 @@ def last_10_matches(
 
             # Circle
             circle = Circle((i, 0.3), 0.38, facecolor=bg_color,
-                             edgecolor="white", linewidth=1.5, alpha=0.85)
+                             edgecolor="white", linewidth=2, alpha=0.85)
             ax.add_patch(circle)
-            ax.text(i, 0.3, symbol, fontsize=16, fontweight="bold",
+            ax.text(i, 0.3, symbol, fontsize=20, fontweight="bold",
                     ha="center", va="center", color="white")
 
             # Opponent name below
-            ax.text(i, -0.35, opponent, fontsize=9, ha="center", va="center",
+            ax.text(i, -0.35, opponent, fontsize=12, ha="center", va="center",
                     color=TEXT_COLOR, alpha=0.7)
             # Score even smaller
-            ax.text(i, -0.65, score, fontsize=7, ha="center", va="center",
+            ax.text(i, -0.65, score, fontsize=9, ha="center", va="center",
                     color=TEXT_COLOR, alpha=0.5)
 
         # Win rate label
         wins = sum(1 for r in results[:10] if r.get("won"))
         wr = wins / max(n, 1)
         wr_color = color_win if wr >= 0.6 else "#E3B341" if wr >= 0.4 else color_loss
-        ax.text(9.8, 1.55, f"{wr:.0%}", fontsize=20, fontweight="bold",
+        ax.text(9.8, 1.55, f"{wr:.0%}", fontsize=26, fontweight="bold",
                 ha="right", va="center", color=wr_color)
 
     p1_default = [{"opponent": "?", "won": i % 2 == 0, "score": "6-4 6-3"}
@@ -536,9 +536,9 @@ def last_10_matches(
     _draw_sequence(ax1, p1_name, p1_results or p1_default, WINNER_COLOR, P2_COLOR)
     _draw_sequence(ax2, p2_name, p2_results or p2_default, WINNER_COLOR, P2_COLOR)
 
-    fig.suptitle("Ultime 10 Partite", fontsize=28, fontweight="bold",
+    fig.suptitle("Ultime 10 Partite", fontsize=34, fontweight="bold",
                  color=TEXT_COLOR, y=0.98)
-    fig.text(0.5, 0.49, "V = Vittoria    S = Sconfitta", fontsize=14,
+    fig.text(0.5, 0.49, "V = Vittoria    S = Sconfitta", fontsize=18,
              ha="center", color=TEXT_COLOR, alpha=0.4)
 
     save_path = save_path or TEMP_DIR / "07_last_10.png"
@@ -596,13 +596,13 @@ def surface_radar(
 
     # Category labels
     ax.set_xticks(angles)
-    ax.set_xticklabels(categories, fontsize=15, fontweight="bold", color=TEXT_COLOR)
+    ax.set_xticklabels(categories, fontsize=18, fontweight="bold", color=TEXT_COLOR)
 
-    ax.legend(fontsize=18, loc="lower right", facecolor=BG_COLOR,
+    ax.legend(fontsize=22, loc="lower right", facecolor=BG_COLOR,
               edgecolor=GRID_COLOR, labelcolor=TEXT_COLOR,
               bbox_to_anchor=(1.15, -0.05))
 
-    ax.set_title("Rendimento per Superficie", fontsize=28, fontweight="bold",
+    ax.set_title("Rendimento per Superficie", fontsize=34, fontweight="bold",
                  color=TEXT_COLOR, pad=30)
 
     save_path = save_path or TEMP_DIR / "08_surface_radar.png"
@@ -635,21 +635,21 @@ def daily_batch_card(
     ax.axis("off")
 
     # Header
-    ax.text(5, total_h - 0.6, tournament, fontsize=32, fontweight="bold",
+    ax.text(5, total_h - 0.6, tournament, fontsize=38, fontweight="bold",
             ha="center", va="center", color=ACCENT_COLOR)
     ax.text(5, total_h - 1.2, f"Predizioni del giorno — {date_str}",
-            fontsize=18, ha="center", va="center", color=TEXT_COLOR, alpha=0.7)
-    ax.text(5, total_h - 1.7, f"{n} match", fontsize=16,
+            fontsize=22, ha="center", va="center", color=TEXT_COLOR, alpha=0.7)
+    ax.text(5, total_h - 1.7, f"{n} match", fontsize=18,
             ha="center", va="center", color=TEXT_COLOR, alpha=0.5)
 
     # Column headers
     y_header = total_h - header_h + 0.3
-    ax.text(0.3, y_header, "#", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
-    ax.text(1.0, y_header, "Match", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
-    ax.text(5.5, y_header, "Superficie", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
-    ax.text(7.0, y_header, "Predizione", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
-    ax.text(8.5, y_header, "Prob.", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
-    ax.text(9.5, y_header, "Conf.", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(0.3, y_header, "#", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(1.0, y_header, "Match", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(5.5, y_header, "Superficie", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(7.0, y_header, "Predizione", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(8.5, y_header, "Prob.", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(9.5, y_header, "Conf.", fontsize=18, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
 
     # Separator
     ax.plot([0.2, 9.8], [y_header - 0.25, y_header - 0.25],
@@ -676,24 +676,24 @@ def daily_batch_card(
         conf_color = WINNER_COLOR if conf > 0.6 else "#E3B341" if conf > 0.35 else P2_COLOR
 
         # Row content
-        ax.text(0.3, y, str(i + 1), fontsize=16, fontweight="bold",
+        ax.text(0.3, y, str(i + 1), fontsize=20, fontweight="bold",
                 ha="center", va="center", color=TEXT_COLOR, alpha=0.5)
-        ax.text(1.0, y, f"{p1}  vs  {p2}", fontsize=15,
+        ax.text(1.0, y, f"{p1}  vs  {p2}", fontsize=19,
                 va="center", color=TEXT_COLOR)
-        ax.text(5.5, y, surface, fontsize=14, va="center",
+        ax.text(5.5, y, surface, fontsize=18, va="center",
                 color=ACCENT_COLOR, ha="center")
-        ax.text(7.0, y, winner, fontsize=16, fontweight="bold",
+        ax.text(7.0, y, winner, fontsize=20, fontweight="bold",
                 va="center", color=WINNER_COLOR, ha="center")
-        ax.text(8.5, y, f"{prob:.0%}", fontsize=16, fontweight="bold",
+        ax.text(8.5, y, f"{prob:.0%}", fontsize=20, fontweight="bold",
                 va="center", ha="center", color=TEXT_COLOR)
-        ax.text(9.5, y, f"{conf:.0%}", fontsize=14, fontweight="bold",
+        ax.text(9.5, y, f"{conf:.0%}", fontsize=18, fontweight="bold",
                 va="center", ha="center", color=conf_color)
 
     # Summary footer
     y_footer = total_h - header_h - n * row_h - 0.3
     high_conf = sum(1 for m in matches if m.get("confidence", 0) > 0.6)
     ax.text(5, y_footer, f"Alta confidenza: {high_conf}/{n} match",
-            fontsize=16, ha="center", va="center", color=TEXT_COLOR, alpha=0.6)
+            fontsize=20, ha="center", va="center", color=TEXT_COLOR, alpha=0.6)
 
     save_path = save_path or TEMP_DIR / "09_daily_card.png"
     return _save(fig, save_path)
@@ -731,9 +731,9 @@ def track_record_accuracy(
     # 50% reference line
     ax1.axhline(50, color=TEXT_COLOR, linestyle="--", alpha=0.3, linewidth=1)
     ax1.text(x[0], 51, "50% (caso)",
-             fontsize=12, color=TEXT_COLOR, alpha=0.4)
+             fontsize=16, color=TEXT_COLOR, alpha=0.4)
 
-    ax1.set_ylabel("Accuratezza (%)", fontsize=16, fontweight="bold",
+    ax1.set_ylabel("Accuratezza (%)", fontsize=20, fontweight="bold",
                    color=WINNER_COLOR)
     ax1.set_ylim(30, 85)
     ax1.tick_params(axis="y", labelcolor=WINNER_COLOR)
@@ -745,7 +745,7 @@ def track_record_accuracy(
     ax2 = ax1.twinx()
     ax2.bar(x, n_matches, width=2,
             color=ACCENT_COLOR, alpha=0.25, label="Match analizzati")
-    ax2.set_ylabel("Match", fontsize=14, color=ACCENT_COLOR, alpha=0.6)
+    ax2.set_ylabel("Match", fontsize=18, color=ACCENT_COLOR, alpha=0.6)
     ax2.tick_params(axis="y", labelcolor=ACCENT_COLOR)
     ax2.spines["top"].set_visible(False)
     ax2.spines["right"].set_visible(False)
@@ -753,12 +753,12 @@ def track_record_accuracy(
     # Overall accuracy badge
     if overall_acc is not None:
         ax1.text(0.98, 0.95, f"Accuratezza totale: {overall_acc:.1%}",
-                 fontsize=22, fontweight="bold", ha="right", va="top",
+                 fontsize=26, fontweight="bold", ha="right", va="top",
                  transform=ax1.transAxes, color=WINNER_COLOR,
                  bbox=dict(boxstyle="round,pad=0.4", facecolor=BG_COLOR,
-                           edgecolor=WINNER_COLOR, linewidth=2, alpha=0.9))
+                           edgecolor=WINNER_COLOR, linewidth=3, alpha=0.9))
 
-    ax1.set_title(f"Track Record Modello — {period_label}", fontsize=28,
+    ax1.set_title(f"Track Record Modello — {period_label}", fontsize=34,
                   fontweight="bold", color=TEXT_COLOR, pad=20)
     ax1.tick_params(axis="x", rotation=30)
 

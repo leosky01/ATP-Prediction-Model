@@ -54,7 +54,7 @@ def generate_daily_script(
         "text": (
             f"Ecco il quadro completo della giornata: {n} match, "
             f"di cui {high_conf} ad alta confidenza. "
-            f"Il modello e piu sicuro su alcune partite rispetto ad altre. Analizziamole nel dettaglio."
+            f"Il modello è più sicuro su alcune partite rispetto ad altre. Analizziamole nel dettaglio."
         ),
         "duration": 12,
     })
@@ -74,10 +74,10 @@ def generate_daily_script(
             "section": f"match_{i+1:02d}",
             "text": (
                 f"Match numero {i+1}: {p1} contro {p2}. "
-                f"Il modello prevede {winner} al {prob:.0%} di probabilita. "
+                f"Il modello prevede {winner} al {prob:.0%} di probabilità. "
                 f"Confidenza: {conf:.0%}. "
-                f"La rete neurale da il {mlp:.0%}, il sistema Elo il {elo:.0%}. "
-                f"Probabilita di sorpresa: {upset:.0%}."
+                f"La rete neurale dà il {mlp:.0%}, il sistema Elo il {elo:.0%}. "
+                f"Probabilità di sorpresa: {upset:.0%}."
             ),
             "duration": 15,
         })
@@ -93,7 +93,7 @@ def generate_daily_script(
                 f"E il nostro track record? Negli {period}, "
                 f"il modello ha azzeccato il {acc:.0%} delle predizioni, "
                 f"su un totale di {n_hist} partite analizzate. "
-                f"Un risultato significativamente superiore al 50% del caso!"
+                f"Un risultato significativamente superiore al 50 per cento del caso!"
             ),
             "duration": 12,
         })
@@ -102,9 +102,9 @@ def generate_daily_script(
     sections.append({
         "section": "daily_outro",
         "text": (
-            f"Questo e tutto per le predizioni di oggi! "
+            f"Questo è tutto per le predizioni di oggi! "
             f"Iscrivetevi al canale e mettete like per supportare il progetto. "
-            f" Alla prossima giornata ATP!"
+            f"Alla prossima giornata ATP!"
         ),
         "duration": 6,
     })
@@ -156,7 +156,7 @@ def generate_script(pred: dict, tournament: str = "Torneo ATP",
     sections.append({
         "section": "prediction_card",
         "text": (
-            f"Il modello prevede la vittoria di {winner} con una probabilita del {favoured_pct:.0%}. "
+            f"Il modello prevede la vittoria di {winner} con una probabilità del {favoured_pct:.0%}. "
             f"Analizziamo nel dettaglio le ragioni di questa previsione."
         ),
         "duration": SECTION_DURATIONS["prediction_card"],
@@ -169,9 +169,9 @@ def generate_script(pred: dict, tournament: str = "Torneo ATP",
         "text": (
             f"Analizziamo le feature chiave. Il ranking favorisce {ranking_fav}. "
             f"Il momentum ha un differenziale di {abs(momentum_diff):.2f}. "
-            f"Negli scontri diretti, il bilancio e di "
+            f"Negli scontri diretti, il bilancio è di "
             f"{h2h.get('p1_wins', 0)} a {h2h.get('p2_wins', 0)}. "
-            f"Ogni cerchio rappresenta una feature: piu grande, piu importante."
+            f"Ogni cerchio rappresenta una feature: più grande, più importante."
         ),
         "duration": SECTION_DURATIONS["feature_circles"],
     })
@@ -196,9 +196,9 @@ def generate_script(pred: dict, tournament: str = "Torneo ATP",
     sections.append({
         "section": "confidence_upset",
         "text": (
-            f"La confidenza del modello e del {confidence:.0%}. "
-            f"La probabilita di upset, ovvero che vinca il giocatore sfavorito, e del {upset:.0%}. "
-            f"Un valore alto indica un match piu incerto e spettacolare."
+            f"La confidenza del modello è del {confidence:.0%}. "
+            f"La probabilità di upset, ovvero che vinca il giocatore sfavorito, è del {upset:.0%}. "
+            f"Un valore alto indica un match più incerto e spettacolare."
         ),
         "duration": SECTION_DURATIONS["confidence_upset"],
     })
@@ -208,8 +208,8 @@ def generate_script(pred: dict, tournament: str = "Torneo ATP",
         "section": "model_breakdown",
         "text": (
             f"Vediamo il contributo dei singoli modelli. "
-            f"La rete neurale MLP da il {mlp_prob:.0%} per {p1_name}. "
-            f"Il sistema Elo rating da il {elo_prob:.0%}. "
+            f"La rete neurale MLP dà il {mlp_prob:.0%} per {p1_name}. "
+            f"Il sistema Elo rating dà il {elo_prob:.0%}. "
             f"La combinazione blend, con alpha pari a {alpha:.2f}, produce la previsione finale."
         ),
         "duration": SECTION_DURATIONS["model_breakdown"],
@@ -219,7 +219,7 @@ def generate_script(pred: dict, tournament: str = "Torneo ATP",
     sections.append({
         "section": "outro",
         "text": (
-            f"Questo e tutto per oggi! Il nostro modello punta su {winner}. "
+            f"Questo è tutto per oggi! Il nostro modello punta su {winner}. "
             f"Seguite il canale per le prossime predizioni ATP. Alla prossima!"
         ),
         "duration": SECTION_DURATIONS["outro"],
@@ -286,7 +286,7 @@ def compose_video(
 
     for frame_path, audio_path in zip(mapped_frames, audio_files):
         audio_clip = AudioFileClip(str(audio_path))
-        duration = audio_clip.duration + 0.5  # slight padding
+        duration = audio_clip.duration
 
         img_clip = (ImageClip(str(frame_path))
                     .with_duration(duration)
