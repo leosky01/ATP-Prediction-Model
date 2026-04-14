@@ -60,3 +60,49 @@ ELO_K_SHAPE = 0.4
 ELO_DECAY_LAMBDA = 0.01
 ELO_DECAY_THRESHOLD_DAYS = 90
 ELO_COMEBACK_K_BOOST = 1.5
+
+# ── Video generation ─────────────────────────────────────────────────────────
+OUTPUT_DIR = BASE_DIR / "output"
+TEMP_DIR = OUTPUT_DIR / "temp"
+VIDEOS_DIR = OUTPUT_DIR / "videos"
+THUMBNAILS_DIR = OUTPUT_DIR / "thumbnails"
+
+VIDEO_WIDTH = 1920
+VIDEO_HEIGHT = 1080
+VIDEO_FPS = 1
+THUMB_WIDTH = 1280
+THUMB_HEIGHT = 720
+
+TTS_VOICE = "it-IT-ElsaNeural"
+TTS_RATE = "-5%"
+
+# Dark theme colours
+BG_COLOR = "#0D1117"
+TEXT_COLOR = "#E6EDF3"
+P1_COLOR = "#58A6FF"       # blue
+P2_COLOR = "#F85149"       # red
+WINNER_COLOR = "#3FB950"   # green
+ACCENT_COLOR = "#D2A8FF"   # purple accent
+GRID_COLOR = "#21262D"
+
+# Section durations (seconds) – used for narration timing
+SECTION_DURATIONS = {
+    "intro": 8,
+    "prediction_card": 10,
+    "feature_circles": 15,
+    "player_comparison": 12,
+    "confidence_upset": 8,
+    "model_breakdown": 8,
+    "outro": 5,
+}
+
+# Feature labels (Italian) for circle chart
+FEATURE_LABELS_IT = {
+    "rank_diff": "Diff. Ranking",
+    "odds_ratio": "Quota",
+    "win_rate_diff": "Forma",
+    "streak_diff": "Serie",
+    "h2h_win_rate": "Scontri Diretti",
+    "momentum_diff": "Momentum",
+    "surface_perf_diff": "Rendimento Superficie",
+}

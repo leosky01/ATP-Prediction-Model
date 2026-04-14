@@ -89,16 +89,20 @@ python -m src.elo_tracker add-match \
 
 ```
 src/
-├── config.py          # Centralised configuration (paths, hyperparameters)
+├── config.py          # Centralised configuration (paths, hyperparameters, video settings)
 ├── model.py           # EnhancedMLP network + TennisDataset
 ├── features.py        # Feature engineering pipeline
 ├── train.py           # Training & evaluation script
 ├── calibrate.py       # Isotonic calibration & strategy evaluation
 ├── predict.py         # Live prediction system (MLP + Elo blend)
 ├── elo_tracker.py     # Advanced Elo system with decay + per-surface
+├── viz.py             # Video visualisations (5 chart types, dark theme)
+├── video.py           # TTS narration + video composition + thumbnail
+├── make_video.py      # CLI orchestrator: predict → video generation
 └── __init__.py
 data/                  # Dataset (git-ignored)
 models/                # Trained artifacts (git-ignored, regenerated)
+output/                # Generated videos, thumbnails, temp frames (git-ignored)
 ```
 
 ## Dataset
@@ -162,6 +166,53 @@ The blend mode also computes:
 - **Upset probability**: based on upset signals, ranking gap, and odds ratio
 - **Momentum**: `0.7 * win_rate + 0.3 * streak_normalised` per player
 
+## Video Generation
+
+Generate YouTube-ready videos with Italian narration, rich visualisations and TTS audio.
+
+### Single match
+
+```bash
+python -m src.make_video \
+    --player1 "Sinner J." --player2 "Alcaraz C." \
+    --rank1 1 --rank2 3 --odds1 1.90 --odds2 1.95 \
+    --surface Clay --tournament "Roland Garros"
+```
+
+### Batch from JSON
+
+```bash
+python -m src.make_video --matches matches_monte_carlo.json
+```
+
+JSON format:
+```json
+[
+  {
+    "player1": "Sinner J.", "player2": "Alcaraz C.",
+    "rank1": 1, "rank2": 3, "odds1": 1.90, "odds2": 1.95,
+    "surface": "Clay", "tournament": "Roland Garros"
+  }
+]
+```
+
+### Output
+
+| Path | Content |
+|------|---------|
+| `output/videos/*.mp4` | Final video with narration |
+| `output/thumbnails/*_thumb.png` | 1280x720 YouTube thumbnail |
+| `output/temp/*/` | 5 PNG frames + TTS audio segments |
+
+The pipeline generates 5 visualisation frames per match:
+1. **Prediction Card** — hero card with probability bar and confidence
+2. **Feature Circles** — interlocking circles showing feature importance
+3. **Player Comparison** — butterfly chart (P1 vs P2 stats)
+4. **Confidence Gauge** — semicircular gauges for confidence and upset probability
+5. **Model Breakdown** — MLP vs Elo vs Blend bars
+
+All frames use a dark theme (`#0D1117`) at 1920x1080. Audio is generated via `edge-tts` with the `it-IT-CosimoNeural` voice. Video composition uses `moviepy`.
+
 ## Important Notes
 
 - The current training uses a **random train/test split**. 
@@ -174,6 +225,7 @@ The blend mode also computes:
 - PyTorch >= 2.0
 - scikit-learn >= 1.3
 - pandas, numpy, matplotlib, seaborn
+- moviepy, edge-tts, Pillow (for video generation)
 
 See `requirements.txt` for the full list.
 

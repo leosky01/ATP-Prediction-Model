@@ -44,3 +44,6 @@ data/*.csv
 *.out
 .mypy_cache/
 .pytest_cache/
+
+# Generated video output
+output/
