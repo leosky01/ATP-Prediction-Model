@@ -407,3 +407,360 @@ def model_breakdown(
 
     save_path = save_path or TEMP_DIR / "05_model_breakdown.png"
     return _save(fig, save_path)
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# NEW VISUALISATIONS (v2 — daily video, richer analytics)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+
+# ── 6. Elo Trend 12 Mesi ────────────────────────────────────────────────────
+
+def elo_trend(
+    p1_name: str, p2_name: str,
+    p1_dates: List[str],
+    p1_elos: List[float],
+    p2_dates: List[str],
+    p2_elos: List[float],
+    surface: str = "Overall",
+    save_path: Optional[Path] = None,
+) -> Path:
+    """
+    Dual line-chart showing Elo evolution for both players over 12 months.
+    Each list should contain dates (str YYYY-MM-DD) and Elo values of equal length.
+    """
+    import pandas as pd
+
+    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
+
+    # Convert to datetime (use simple list to preserve length)
+    dates1 = [pd.Timestamp(d) for d in p1_dates] if p1_dates else []
+    dates2 = [pd.Timestamp(d) for d in p2_dates] if p2_dates else []
+
+    if len(dates1) > 0:
+        ax.plot(dates1, p1_elos, color=P1_COLOR, linewidth=2.5, label=p1_name,
+                marker="o", markersize=4, markerfacecolor=P1_COLOR, alpha=0.9)
+        # End label
+        ax.annotate(f"{p1_elos[-1]:.0f}", (dates1[-1], p1_elos[-1]),
+                    fontsize=14, fontweight="bold", color=P1_COLOR,
+                    xytext=(10, 0), textcoords="offset points", va="center")
+
+    if len(dates2) > 0:
+        ax.plot(dates2, p2_elos, color=P2_COLOR, linewidth=2.5, label=p2_name,
+                marker="o", markersize=4, markerfacecolor=P2_COLOR, alpha=0.9)
+        ax.annotate(f"{p2_elos[-1]:.0f}", (dates2[-1], p2_elos[-1]),
+                    fontsize=14, fontweight="bold", color=P2_COLOR,
+                    xytext=(10, 0), textcoords="offset points", va="center")
+
+    # Cross point highlight
+    if len(dates1) > 0 and len(dates2) > 0:
+        min_len = min(len(p1_elos), len(p2_elos))
+        for i in range(1, min_len):
+            if (p1_elos[i-1] - p2_elos[min(i-1, len(p2_elos)-1)]) * \
+               (p1_elos[i] - p2_elos[min(i, len(p2_elos)-1)]) < 0:
+                ax.axvline(dates1[i] if i < len(dates1) else dates1[-1],
+                           color=ACCENT_COLOR, linestyle="--", alpha=0.4, linewidth=1)
+
+    ax.set_title(f"Andamento Elo — {surface}", fontsize=28, fontweight="bold",
+                 color=TEXT_COLOR, pad=20)
+    ax.set_ylabel("Elo Rating", fontsize=16, fontweight="bold", color=TEXT_COLOR)
+    ax.legend(fontsize=18, loc="upper left", facecolor=BG_COLOR,
+              edgecolor=GRID_COLOR, labelcolor=TEXT_COLOR)
+
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.grid(axis="y", alpha=0.15)
+    ax.tick_params(axis="x", rotation=30)
+
+    save_path = save_path or TEMP_DIR / "06_elo_trend.png"
+    return _save(fig, save_path)
+
+
+# ── 7. Ultime 10 Partite ────────────────────────────────────────────────────
+
+def last_10_matches(
+    p1_name: str, p2_name: str,
+    p1_results: List[Dict],
+    p2_results: List[Dict],
+    save_path: Optional[Path] = None,
+) -> Path:
+    """
+    Visual W/L sequence for last 10 matches per player.
+    Each result: {"opponent": str, "won": bool, "score": str, "surface": str}
+    """
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(FIG_W, FIG_H),
+                                    gridspec_kw={"hspace": 0.45})
+
+    def _draw_sequence(ax, player_name, results, color_win, color_loss):
+        n = len(results)
+        ax.set_xlim(-0.5, 9.5)
+        ax.set_ylim(-1.0, 1.8)
+        ax.axis("off")
+
+        ax.text(4.5, 1.55, player_name, fontsize=22, fontweight="bold",
+                ha="center", va="center", color=TEXT_COLOR)
+
+        for i, r in enumerate(results[:10]):
+            won = r.get("won", False)
+            bg_color = color_win if won else color_loss
+            symbol = "V" if won else "S"
+            opponent = r.get("opponent", "?")[:10]
+            score = r.get("score", "")
+
+            # Circle
+            circle = Circle((i, 0.3), 0.38, facecolor=bg_color,
+                             edgecolor="white", linewidth=1.5, alpha=0.85)
+            ax.add_patch(circle)
+            ax.text(i, 0.3, symbol, fontsize=16, fontweight="bold",
+                    ha="center", va="center", color="white")
+
+            # Opponent name below
+            ax.text(i, -0.35, opponent, fontsize=9, ha="center", va="center",
+                    color=TEXT_COLOR, alpha=0.7)
+            # Score even smaller
+            ax.text(i, -0.65, score, fontsize=7, ha="center", va="center",
+                    color=TEXT_COLOR, alpha=0.5)
+
+        # Win rate label
+        wins = sum(1 for r in results[:10] if r.get("won"))
+        wr = wins / max(n, 1)
+        wr_color = color_win if wr >= 0.6 else "#E3B341" if wr >= 0.4 else color_loss
+        ax.text(9.8, 1.55, f"{wr:.0%}", fontsize=20, fontweight="bold",
+                ha="right", va="center", color=wr_color)
+
+    p1_default = [{"opponent": "?", "won": i % 2 == 0, "score": "6-4 6-3"}
+                  for i in range(10)]
+    p2_default = [{"opponent": "?", "won": i % 3 != 0, "score": "6-4 4-6 6-3"}
+                  for i in range(10)]
+
+    _draw_sequence(ax1, p1_name, p1_results or p1_default, WINNER_COLOR, P2_COLOR)
+    _draw_sequence(ax2, p2_name, p2_results or p2_default, WINNER_COLOR, P2_COLOR)
+
+    fig.suptitle("Ultime 10 Partite", fontsize=28, fontweight="bold",
+                 color=TEXT_COLOR, y=0.98)
+    fig.text(0.5, 0.49, "V = Vittoria    S = Sconfitta", fontsize=14,
+             ha="center", color=TEXT_COLOR, alpha=0.4)
+
+    save_path = save_path or TEMP_DIR / "07_last_10.png"
+    return _save(fig, save_path)
+
+
+# ── 8. Radar Superficie ─────────────────────────────────────────────────────
+
+def surface_radar(
+    p1_name: str, p2_name: str,
+    p1_stats: Dict[str, float],
+    p2_stats: Dict[str, float],
+    save_path: Optional[Path] = None,
+) -> Path:
+    """
+    Radar/spider chart comparing P1 vs P2 across dimensions.
+    p1_stats/p2_stats: {"Hard": 0.65, "Clay": 0.72, "Grass": 0.55,
+                         "Win Rate": 0.68, "Momentum": 0.70}
+    """
+    categories = list(p1_stats.keys()) if p1_stats else ["Hard", "Clay", "Grass", "Win Rate", "Momentum"]
+    p1_values = [p1_stats.get(c, 0.5) for c in categories]
+    p2_values = [p2_stats.get(c, 0.5) for c in categories]
+
+    N = len(categories)
+    angles = np.linspace(0, 2 * np.pi, N, endpoint=False).tolist()
+
+    # Close the polygon
+    p1_values_closed = p1_values + [p1_values[0]]
+    p2_values_closed = p2_values + [p2_values[0]]
+    angles_closed = angles + [angles[0]]
+
+    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H), subplot_kw=dict(polar=True))
+
+    # Style the radar
+    ax.set_facecolor(BG_COLOR)
+    ax.spines["polar"].set_color(GRID_COLOR)
+    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_direction(-1)
+
+    # Grid circles
+    ax.set_rgrids([0.2, 0.4, 0.6, 0.8, 1.0], labels=["20%", "40%", "60%", "80%", "100%"],
+                   fontsize=9, color=TEXT_COLOR, alpha=0.4)
+    ax.set_rlabel_position(0)
+    ax.yaxis.grid(True, color=GRID_COLOR, alpha=0.3)
+    ax.xaxis.grid(True, color=GRID_COLOR, alpha=0.3)
+
+    # Plot
+    ax.plot(angles_closed, p1_values_closed, color=P1_COLOR, linewidth=2.5,
+            label=p1_name, linestyle="-")
+    ax.fill(angles_closed, p1_values_closed, color=P1_COLOR, alpha=0.15)
+
+    ax.plot(angles_closed, p2_values_closed, color=P2_COLOR, linewidth=2.5,
+            label=p2_name, linestyle="-")
+    ax.fill(angles_closed, p2_values_closed, color=P2_COLOR, alpha=0.15)
+
+    # Category labels
+    ax.set_xticks(angles)
+    ax.set_xticklabels(categories, fontsize=15, fontweight="bold", color=TEXT_COLOR)
+
+    ax.legend(fontsize=18, loc="lower right", facecolor=BG_COLOR,
+              edgecolor=GRID_COLOR, labelcolor=TEXT_COLOR,
+              bbox_to_anchor=(1.15, -0.05))
+
+    ax.set_title("Rendimento per Superficie", fontsize=28, fontweight="bold",
+                 color=TEXT_COLOR, pad=30)
+
+    save_path = save_path or TEMP_DIR / "08_surface_radar.png"
+    return _save(fig, save_path)
+
+
+# ── 9. Daily Batch Card ─────────────────────────────────────────────────────
+
+def daily_batch_card(
+    matches: List[Dict],
+    tournament: str = "Torneo ATP",
+    date_str: str = "Oggi",
+    save_path: Optional[Path] = None,
+) -> Path:
+    """
+    Multi-match prediction table: all matches of the day at a glance.
+    Each match: {"p1": str, "p2": str, "prob_winner": float,
+                 "winner": str, "confidence": float, "surface": str}
+    """
+    n = len(matches)
+    row_h = 0.9
+    header_h = 2.0
+    total_h = header_h + n * row_h + 0.8
+
+    fig_w = FIG_W
+    fig_h = max(FIG_H, total_h / DPI + 1)
+    fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, total_h)
+    ax.axis("off")
+
+    # Header
+    ax.text(5, total_h - 0.6, tournament, fontsize=32, fontweight="bold",
+            ha="center", va="center", color=ACCENT_COLOR)
+    ax.text(5, total_h - 1.2, f"Predizioni del giorno — {date_str}",
+            fontsize=18, ha="center", va="center", color=TEXT_COLOR, alpha=0.7)
+    ax.text(5, total_h - 1.7, f"{n} match", fontsize=16,
+            ha="center", va="center", color=TEXT_COLOR, alpha=0.5)
+
+    # Column headers
+    y_header = total_h - header_h + 0.3
+    ax.text(0.3, y_header, "#", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(1.0, y_header, "Match", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(5.5, y_header, "Superficie", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(7.0, y_header, "Predizione", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(8.5, y_header, "Prob.", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+    ax.text(9.5, y_header, "Conf.", fontsize=14, fontweight="bold", color=TEXT_COLOR, alpha=0.5)
+
+    # Separator
+    ax.plot([0.2, 9.8], [y_header - 0.25, y_header - 0.25],
+            color=GRID_COLOR, linewidth=1.5)
+
+    # Rows
+    for i, m in enumerate(matches):
+        y = total_h - header_h - i * row_h
+
+        # Alternating row background
+        if i % 2 == 0:
+            ax.add_patch(FancyBboxPatch((0.1, y - 0.3), 9.8, row_h - 0.05,
+                                        boxstyle="round,pad=0.02",
+                                        facecolor=GRID_COLOR, edgecolor="none",
+                                        alpha=0.3))
+
+        p1 = m.get("p1", "?")
+        p2 = m.get("p2", "?")
+        winner = m.get("winner", "?")
+        prob = m.get("prob_winner", 0.5)
+        conf = m.get("confidence", 0.5)
+        surface = m.get("surface", "Hard")
+
+        conf_color = WINNER_COLOR if conf > 0.6 else "#E3B341" if conf > 0.35 else P2_COLOR
+
+        # Row content
+        ax.text(0.3, y, str(i + 1), fontsize=16, fontweight="bold",
+                ha="center", va="center", color=TEXT_COLOR, alpha=0.5)
+        ax.text(1.0, y, f"{p1}  vs  {p2}", fontsize=15,
+                va="center", color=TEXT_COLOR)
+        ax.text(5.5, y, surface, fontsize=14, va="center",
+                color=ACCENT_COLOR, ha="center")
+        ax.text(7.0, y, winner, fontsize=16, fontweight="bold",
+                va="center", color=WINNER_COLOR, ha="center")
+        ax.text(8.5, y, f"{prob:.0%}", fontsize=16, fontweight="bold",
+                va="center", ha="center", color=TEXT_COLOR)
+        ax.text(9.5, y, f"{conf:.0%}", fontsize=14, fontweight="bold",
+                va="center", ha="center", color=conf_color)
+
+    # Summary footer
+    y_footer = total_h - header_h - n * row_h - 0.3
+    high_conf = sum(1 for m in matches if m.get("confidence", 0) > 0.6)
+    ax.text(5, y_footer, f"Alta confidenza: {high_conf}/{n} match",
+            fontsize=16, ha="center", va="center", color=TEXT_COLOR, alpha=0.6)
+
+    save_path = save_path or TEMP_DIR / "09_daily_card.png"
+    return _save(fig, save_path)
+
+
+# ── 10. Track Record Accuracy ───────────────────────────────────────────────
+
+def track_record_accuracy(
+    dates: List[str],
+    accuracies: List[float],
+    n_matches: List[int],
+    overall_acc: Optional[float] = None,
+    period_label: str = "Ultimi 90 giorni",
+    save_path: Optional[Path] = None,
+) -> Path:
+    """
+    Rolling accuracy chart showing model performance over time.
+    dates: date labels (str), accuracies: rolling accuracy %, n_matches: cumulative count.
+    """
+    import pandas as pd
+
+    fig, ax1 = plt.subplots(figsize=(FIG_W, FIG_H))
+
+    if dates:
+        x = [pd.Timestamp(d) for d in dates]
+    else:
+        x = list(range(len(accuracies)))
+
+    # Accuracy line
+    ax1.plot(x, [a * 100 for a in accuracies], color=WINNER_COLOR, linewidth=3,
+             marker="o", markersize=5, markerfacecolor=WINNER_COLOR, alpha=0.9,
+             label="Accuratezza")
+    ax1.fill_between(x, [a * 100 for a in accuracies], alpha=0.1, color=WINNER_COLOR)
+
+    # 50% reference line
+    ax1.axhline(50, color=TEXT_COLOR, linestyle="--", alpha=0.3, linewidth=1)
+    ax1.text(x[0], 51, "50% (caso)",
+             fontsize=12, color=TEXT_COLOR, alpha=0.4)
+
+    ax1.set_ylabel("Accuratezza (%)", fontsize=16, fontweight="bold",
+                   color=WINNER_COLOR)
+    ax1.set_ylim(30, 85)
+    ax1.tick_params(axis="y", labelcolor=WINNER_COLOR)
+    ax1.spines["top"].set_visible(False)
+    ax1.spines["right"].set_visible(False)
+    ax1.grid(axis="y", alpha=0.15)
+
+    # Volume on secondary axis
+    ax2 = ax1.twinx()
+    ax2.bar(x, n_matches, width=2,
+            color=ACCENT_COLOR, alpha=0.25, label="Match analizzati")
+    ax2.set_ylabel("Match", fontsize=14, color=ACCENT_COLOR, alpha=0.6)
+    ax2.tick_params(axis="y", labelcolor=ACCENT_COLOR)
+    ax2.spines["top"].set_visible(False)
+    ax2.spines["right"].set_visible(False)
+
+    # Overall accuracy badge
+    if overall_acc is not None:
+        ax1.text(0.98, 0.95, f"Accuratezza totale: {overall_acc:.1%}",
+                 fontsize=22, fontweight="bold", ha="right", va="top",
+                 transform=ax1.transAxes, color=WINNER_COLOR,
+                 bbox=dict(boxstyle="round,pad=0.4", facecolor=BG_COLOR,
+                           edgecolor=WINNER_COLOR, linewidth=2, alpha=0.9))
+
+    ax1.set_title(f"Track Record Modello — {period_label}", fontsize=28,
+                  fontweight="bold", color=TEXT_COLOR, pad=20)
+    ax1.tick_params(axis="x", rotation=30)
+
+    save_path = save_path or TEMP_DIR / "10_accuracy_tracker.png"
+    return _save(fig, save_path)

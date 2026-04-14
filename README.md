@@ -196,22 +196,39 @@ JSON format:
 ]
 ```
 
+### Daily video (all matches in one video)
+
+```bash
+python -m src.make_video --daily matches_monte_carlo.json \
+    --daily-tournament "Monte Carlo Masters" --daily-date "2026-04-10"
+```
+
+Generates a single video covering all matches of the day with a daily overview card, per-match analysis, and track record.
+
 ### Output
 
 | Path | Content |
 |------|---------|
 | `output/videos/*.mp4` | Final video with narration |
 | `output/thumbnails/*_thumb.png` | 1280x720 YouTube thumbnail |
-| `output/temp/*/` | 5 PNG frames + TTS audio segments |
+| `output/temp/*/` | PNG frames + TTS audio segments |
 
-The pipeline generates 5 visualisation frames per match:
-1. **Prediction Card** — hero card with probability bar and confidence
-2. **Feature Circles** — interlocking circles showing feature importance
-3. **Player Comparison** — butterfly chart (P1 vs P2 stats)
-4. **Confidence Gauge** — semicircular gauges for confidence and upset probability
-5. **Model Breakdown** — MLP vs Elo vs Blend bars
+The pipeline generates up to 10 visualisation frames per match:
 
-All frames use a dark theme (`#0D1117`) at 1920x1080. Audio is generated via `edge-tts` with the `it-IT-CosimoNeural` voice. Video composition uses `moviepy`.
+| # | Chart | Description |
+|---|-------|-------------|
+| 1 | **Prediction Card** | Hero card with probability bar and confidence |
+| 2 | **Feature Circles** | Interlocking circles showing feature importance |
+| 3 | **Player Comparison** | Butterfly chart (P1 vs P2 stats) |
+| 4 | **Confidence Gauge** | Semicircular gauges for confidence and upset probability |
+| 5 | **Model Breakdown** | MLP vs Elo vs Blend bars |
+| 6 | **Elo Trend** | 12-month Elo evolution for both players |
+| 7 | **Last 10 Matches** | W/L sequence with opponents and scores |
+| 8 | **Surface Radar** | Spider chart comparing surface performance |
+| 9 | **Daily Batch Card** | Multi-match overview table (daily mode) |
+| 10 | **Track Record** | Rolling accuracy over time |
+
+All frames use a dark theme (`#0D1117`) at 1920x1080. Audio is generated via `edge-tts` with the `it-IT-ElsaNeural` voice. Video composition uses `moviepy`.
 
 ## Important Notes
 

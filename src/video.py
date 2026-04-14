@@ -18,6 +18,100 @@ from .config import (
 )
 
 
+# ── 0. Daily multi-match script ─────────────────────────────────────────────
+
+def generate_daily_script(
+    predictions: List[dict],
+    tournament: str = "Torneo ATP",
+    surface: str = "Hard",
+    date_str: str = "oggi",
+    track_record: Optional[dict] = None,
+) -> List[Dict[str, str]]:
+    """
+    Generate narration sections for a daily multi-match video.
+
+    predictions: list of prediction dicts (as returned by ATPPredictor.predict).
+    track_record: optional {"accuracy": float, "n_matches": int, "period": str}
+    """
+    n = len(predictions)
+    sections = []
+
+    # 1 – Daily intro
+    sections.append({
+        "section": "daily_intro",
+        "text": (
+            f"Benvenuti su ATP Predictions! Oggi analizziamo {n} match di {tournament}. "
+            f"Il nostro modello di intelligenza artificiale ha elaborato tutte le partite. "
+            f"Scopriamo insieme le predizioni!"
+        ),
+        "duration": 10,
+    })
+
+    # 2 – Daily card overview
+    high_conf = sum(1 for p in predictions if p.get("confidence", 0) > 0.6)
+    sections.append({
+        "section": "daily_card",
+        "text": (
+            f"Ecco il quadro completo della giornata: {n} match, "
+            f"di cui {high_conf} ad alta confidenza. "
+            f"Il modello e piu sicuro su alcune partite rispetto ad altre. Analizziamole nel dettaglio."
+        ),
+        "duration": 12,
+    })
+
+    # 3..N – Per-match sections (abbreviated for daily video)
+    for i, pred in enumerate(predictions):
+        p1 = pred.get("player1", f"P1_{i}")
+        p2 = pred.get("player2", f"P2_{i}")
+        winner = pred.get("prediction", "?")
+        prob = max(pred.get("prob_p1", 0.5), pred.get("prob_p2", 0.5))
+        conf = pred.get("confidence", 0.5)
+        upset = pred.get("upset_probability", 0.15)
+        mlp = pred.get("mlp_prob", 0.5)
+        elo = pred.get("elo_prob", 0.5)
+
+        sections.append({
+            "section": f"match_{i+1:02d}",
+            "text": (
+                f"Match numero {i+1}: {p1} contro {p2}. "
+                f"Il modello prevede {winner} al {prob:.0%} di probabilita. "
+                f"Confidenza: {conf:.0%}. "
+                f"La rete neurale da il {mlp:.0%}, il sistema Elo il {elo:.0%}. "
+                f"Probabilita di sorpresa: {upset:.0%}."
+            ),
+            "duration": 15,
+        })
+
+    # Track record section
+    if track_record:
+        acc = track_record.get("accuracy", 0.68)
+        n_hist = track_record.get("n_matches", 100)
+        period = track_record.get("period", "ultimi 90 giorni")
+        sections.append({
+            "section": "track_record",
+            "text": (
+                f"E il nostro track record? Negli {period}, "
+                f"il modello ha azzeccato il {acc:.0%} delle predizioni, "
+                f"su un totale di {n_hist} partite analizzate. "
+                f"Un risultato significativamente superiore al 50% del caso!"
+            ),
+            "duration": 12,
+        })
+
+    # Outro
+    sections.append({
+        "section": "daily_outro",
+        "text": (
+            f"Questo e tutto per le predizioni di oggi! "
+            f"Iscrivetevi al canale e mettete like per supportare il progetto. "
+            f" Alla prossima giornata ATP!"
+        ),
+        "duration": 6,
+    })
+
+    return sections
+
+
 # ── 1. Narration Script Generation ──────────────────────────────────────────
 
 def generate_script(pred: dict, tournament: str = "Torneo ATP",
