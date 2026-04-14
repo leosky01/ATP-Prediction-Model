@@ -1,8 +1,5 @@
 """
-ATP Tennis Match Predictor - Source Module
+ATP Tennis Match Predictor
 """
 
-from .elo_tracker import AdvancedEloSystem
-
-__all__ = ['AdvancedEloSystem']
-__version__ = '1.0.0'
+__version__ = "2.0.0"

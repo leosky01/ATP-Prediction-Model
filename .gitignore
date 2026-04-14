@@ -8,7 +8,7 @@ __pycache__/
 dist/
 build/
 
-# Jupyter Notebook
+# Jupyter
 .ipynb_checkpoints/
 
 # Environments
@@ -24,19 +24,21 @@ venv/
 *.swo
 *~
 
-# Trained models (large binary files, regenerate via training)
+# Trained model artifacts (large binary, regenerate via training)
 models/*.pt
 models/*.pth
 models/*.joblib
 models/*.pkl
-models/*.cbm
+models/*.csv
+models/*.png
 
-# Compressed data
-*.csv.gz
-*.parquet
-*.feather
+# Elo state (regenerate via elo_tracker build)
+models/elo_tracker/
 
-# Temporary / generated
+# Data
+data/*.csv
+
+# Temporary
 *.tmp
 *.log
 *.out
