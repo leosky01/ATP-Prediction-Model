@@ -34,7 +34,14 @@ tournaments = get_tournament_list()
 surfaces = get_surface_list()
 
 # ── Paywall check ────────────────────────────────────────────────────────
-ip = st.query_params.get("ip", "") or getattr(st, "context", {}).get("headers", {}).get("X-Forwarded-For", "unknown")
+_ctx_headers = getattr(st, "context", None)
+if _ctx_headers is not None:
+    try:
+        ip = st.query_params.get("ip", "") or st.context.headers.get("X-Forwarded-For", "unknown")
+    except (AttributeError, TypeError):
+        ip = st.query_params.get("ip", "") or "unknown"
+else:
+    ip = st.query_params.get("ip", "") or "unknown"
 can_do, reason = can_predict(ip)
 
 if not can_do:
