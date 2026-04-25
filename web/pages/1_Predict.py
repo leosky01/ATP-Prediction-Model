@@ -1,5 +1,6 @@
 """Predict page: input match details, see 8 interactive Plotly charts."""
 
+import datetime
 import json
 import sys
 from pathlib import Path
@@ -16,7 +17,7 @@ init_db()
 
 from web.auth.manager import can_predict, record_prediction_after, is_logged_in, get_current_user_id
 from web.utils.predictor_cache import get_predictor, get_history
-from web.utils.data_helpers import get_player_list, get_tournament_list, get_surface_list
+from web.utils.data_helpers import get_player_list, get_series_list, get_surface_list
 from web.charts.prediction_card import create_prediction_card
 from web.charts.feature_circles import create_feature_circles
 from web.charts.butterfly_comparison import create_butterfly_comparison
@@ -33,7 +34,7 @@ st.set_page_config(page_title="Predizione", page_icon="🎾", layout="wide")
 
 # Load data
 players = get_player_list()
-tournaments = get_tournament_list()
+categories = get_series_list()
 surfaces = get_surface_list()
 
 # ── Paywall check ────────────────────────────────────────────────────────
@@ -81,7 +82,9 @@ with st.sidebar:
         odds2 = st.number_input("Quota P2", min_value=1.01, max_value=50.0, value=1.95, step=0.05)
 
     surface = st.selectbox("Superficie", surfaces, index=0)
-    tournament = st.selectbox("Torneo", tournaments, index=0)
+    category = st.selectbox("Categoria Torneo", categories, index=0)
+
+    match_date = st.date_input("Data", value=datetime.date.today())
 
     st.divider()
     mode = st.radio("Modalita", ["blend", "mlp", "elo"], horizontal=True)
@@ -98,7 +101,8 @@ if predict_btn:
             player1=player1, player2=player2,
             rank1=rank1, rank2=rank2,
             odds1=odds1, odds2=odds2,
-            surface=surface, tournament=tournament,
+            surface=surface, tournament=category,
+            date_str=str(match_date),
             mode=mode, alpha=alpha,
         )
 
@@ -109,7 +113,7 @@ if predict_btn:
             player1=player1, player2=player2,
             rank1=rank1, rank2=rank2,
             odds1=odds1, odds2=odds2,
-            surface=surface, tournament=tournament,
+            surface=surface, tournament=category,
             result_json=json.dumps(result),
             confidence=result["confidence"],
         )
@@ -119,7 +123,8 @@ if predict_btn:
             "player1": player1, "player2": player2,
             "rank1": rank1, "rank2": rank2,
             "odds1": odds1, "odds2": odds2,
-            "surface": surface, "tournament": tournament,
+            "surface": surface, "tournament": category,
+            "date": str(match_date),
             "mode": mode, "alpha": alpha,
         }
 

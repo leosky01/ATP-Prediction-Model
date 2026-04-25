@@ -30,6 +30,14 @@ def get_tournament_list() -> list[str]:
 
 
 @st.cache_data
+def get_series_list() -> list[str]:
+    """Return sorted list of unique tournament series/categories."""
+    df = load_match_data()
+    series = sorted(df["Series"].dropna().unique().tolist())
+    return series
+
+
+@st.cache_data
 def get_surface_list() -> list[str]:
     """Return sorted list of surfaces."""
     return ["Hard", "Clay", "Grass"]
