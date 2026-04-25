@@ -1,0 +1,1 @@
+rank_diff,odds_ratio,win_rate_diff,streak_diff,min_rank,max_rank,min_odds,max_odds,max_win_rate,min_win_rate,max_streak,min_streak,h2h_win_rate,h2h_matches

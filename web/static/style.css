@@ -1,0 +1,83 @@
+/* ATP Predictor – Custom Dark Theme Overrides */
+
+/* Main app background */
+.stApp {
+    background-color: #0D1117;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #161B22;
+    border-right: 1px solid #1E2733;
+}
+
+/* Cards */
+.stMetric {
+    background-color: #161B22;
+    border: 1px solid #1E2733;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: #161B22;
+    border-radius: 8px 8px 0 0;
+}
+
+.stTabs [data-baseweb="tab"] {
+    color: #8B949E;
+}
+
+.stTabs [aria-selected="true"] {
+    color: #4FC3F7 !important;
+    border-bottom-color: #4FC3F7 !important;
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: #1E2733;
+    color: #4FC3F7;
+    border: 1px solid #4FC3F7;
+    border-radius: 8px;
+}
+
+.stButton > button:hover {
+    background-color: #4FC3F7;
+    color: #0D1117;
+}
+
+/* Paywall box */
+.paywall-box {
+    background: linear-gradient(135deg, #161B22 0%, #1E2733 100%);
+    border: 2px solid #4FC3F7;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 500px;
+}
+
+/* Success/Error boxes */
+.element-container .stAlert {
+    border-radius: 8px;
+}
+
+/* Plotly chart containers */
+.js-plotly-plot .plotly .main-svg {
+    border-radius: 8px;
+}
+
+/* Inputs */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stSelectbox > div > div {
+    background-color: #1E2733;
+    color: #FFFFFF;
+    border-color: #1E2733;
+}
+
+/* Slider */
+.stSlider > div > div > div > div {
+    background-color: #4FC3F7;
+}

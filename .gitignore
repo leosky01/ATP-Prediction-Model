@@ -24,19 +24,23 @@ venv/
 *.swo
 *~
 
-# Trained model artifacts (large binary, regenerate via training)
+# Trained model artifacts — keep these for cloud deployment
 models/*.pt
 models/*.pth
 models/*.joblib
 models/*.pkl
 models/*.csv
 models/*.png
-
-# Elo state (regenerate via elo_tracker build)
 models/elo_tracker/
+!models/best_model_invariant.pt
+!models/scaler_invariant.joblib
+!models/cat_encoder_invariant.joblib
+!models/elo_state.joblib
+!models/feature_cols_invariant.txt
 
-# Data
+# Data — keep cleaned dataset for cloud deployment
 data/*.csv
+!data/atp_tennis_cleaned.csv
 
 # Temporary
 *.tmp
@@ -47,3 +51,9 @@ data/*.csv
 
 # Generated video output
 output/
+
+# Web app database
+web_db/
+
+# Streamlit secrets (contains PayPal credentials)
+.streamlit/secrets.toml
