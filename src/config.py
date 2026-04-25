@@ -11,12 +11,12 @@ MODELS_DIR = BASE_DIR / "models"
 FIGURES_DIR = MODELS_DIR  # figures saved alongside model artifacts
 
 DATASET_PATH = DATA_DIR / "atp_tennis_cleaned.csv"
-MODEL_PATH = MODELS_DIR / "best_model.pt"
-SCALER_PATH = MODELS_DIR / "scaler.joblib"
-ENCODER_PATH = MODELS_DIR / "encoder.joblib"
-FEATURE_COLS_PATH = MODELS_DIR / "feature_cols.txt"
-OPTIMIZATION_CONFIG_PATH = MODELS_DIR / "optimization_config.joblib"
-ELO_STATE_PATH = MODELS_DIR / "elo_tracker" / "elo_state.joblib"
+MODEL_PATH = MODELS_DIR / "best_model_invariant.pt"
+SCALER_PATH = MODELS_DIR / "scaler_invariant.joblib"
+ENCODER_PATH = MODELS_DIR / "cat_encoder_invariant.joblib"
+FEATURE_COLS_PATH = MODELS_DIR / "feature_cols_invariant.txt"
+OPTIMIZATION_CONFIG_PATH = MODELS_DIR / "optimization_config_bilanciato.joblib"
+ELO_STATE_PATH = MODELS_DIR / "elo_state.joblib"
 
 # ── Dataset ──────────────────────────────────────────────────────────────────
 DATE_START = "2010-01-01"
