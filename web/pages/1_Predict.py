@@ -11,6 +11,9 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
+from web.db.database import init_db
+init_db()
+
 from web.auth.manager import can_predict, record_prediction_after, is_logged_in, get_current_user_id
 from web.utils.predictor_cache import get_predictor, get_history
 from web.utils.data_helpers import get_player_list, get_tournament_list, get_surface_list

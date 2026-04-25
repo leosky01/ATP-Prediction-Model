@@ -12,7 +12,8 @@ if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
 from web.auth.manager import is_logged_in, get_current_user_id, is_admin
-from web.db.database import get_session
+from web.db.database import init_db, get_session
+init_db()
 from web.db.models import PredictionLog
 
 st.set_page_config(page_title="Storico", page_icon="📋", layout="wide")

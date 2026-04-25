@@ -12,7 +12,8 @@ if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
 from web.auth.manager import is_admin
-from web.db.database import get_session
+from web.db.database import init_db, get_session
+init_db()
 from web.db.models import User, Subscription, PredictionLog, FreeTierUsage
 
 st.set_page_config(page_title="Admin", page_icon="⚙️", layout="wide")

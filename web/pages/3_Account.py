@@ -9,6 +9,9 @@ _project_root = Path(__file__).resolve().parents[2]
 if str(_project_root) not in sys.path:
     sys.path.insert(0, str(_project_root))
 
+from web.db.database import init_db
+init_db()
+
 from web.auth.manager import (
     is_logged_in, login_user, logout_user, register_user,
     get_current_user_id, has_active_subscription, get_credits_remaining,
