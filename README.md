@@ -230,6 +230,49 @@ The pipeline generates up to 10 visualisation frames per match:
 
 All frames use a dark theme (`#0D1117`) at 1920x1080. Audio is generated via `edge-tts` with the `it-IT-ElsaNeural` voice. Video composition uses `moviepy`.
 
+## Web App (Streamlit)
+
+Interactive web interface with 8 Plotly charts, user authentication, and PayPal payments.
+
+```bash
+pip install -r requirements-web.txt
+streamlit run web/app.py
+```
+
+### Features
+
+| Feature | Description |
+|---------|-------------|
+| Predictions | Match input form → 8 interactive Plotly charts |
+| Free tier | 3 predictions without registration (IP-based) |
+| Auth | Register/login with bcrypt password hashing |
+| Payments | PayPal REST API v2 (pay-per-use and weekly subscription) |
+| Admin | Dashboard with users, revenue, and prediction stats |
+
+### Web app structure
+
+```
+web/
+├── app.py                 # Entry point
+├── pages/
+│   ├── 1_Predict.py       # Match prediction with 8 Plotly charts
+│   ├── 2_History.py       # Prediction history
+│   ├── 3_Account.py       # Login/register/payments
+│   └── 4_Admin.py         # Admin dashboard
+├── charts/                # 8 Plotly interactive chart modules
+├── auth/                  # Authentication + PayPal client
+├── db/                    # SQLAlchemy ORM (SQLite)
+└── utils/                 # Predictor cache + data helpers
+```
+
+### PayPal webhook (separate process)
+
+```bash
+python -m web.webhook_handler    # Runs on port 5001
+```
+
+Configure credentials in `.streamlit/secrets.toml` (gitignored).
+
 ## Important Notes
 
 - The current training uses a **random train/test split**. 
