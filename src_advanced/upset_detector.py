@@ -1417,32 +1417,26 @@ class UpsetLivePredictor:
         # 10. Fatigue features
         features.update(self._compute_fatigue(p1, p2, target_date))
 
-        # 11. Compute the 11 upset features (before perspective normalization,
-        #     but using the raw diff features which are P1-P2 perspective)
+        # 11. Compute the 11 upset features BEFORE normalization (P1-P2 perspective)
+        #     This matches the training pipeline where compute_upset_features()
+        #     is called before normalize_to_underdog_perspective()
         upset_feats = self._compute_upset_features_single(
             features, rank1, rank2, odds1, odds2,
         )
-        features.update(upset_feats)
 
-        # 12. Determine underdog and normalize perspective
+        # 12. Determine underdog and normalize the 188 base features
         p1_is_underdog = odds1 > odds2
         features = self._normalize_perspective(features, p1_is_underdog)
 
-        # After normalization, re-compute upset features that depend on
-        # the normalized perspective (form trend, fatigue, ace edge, etc.)
-        # Actually: the upset features use diff features which have been swapped.
-        # Re-compute them from the normalized features.
-        upset_feats_norm = self._compute_upset_features_single(
-            features, rank1, rank2, odds1, odds2,
-        )
-        features.update(upset_feats_norm)
+        # 13. Now add upset features (computed from P1-P2, same as training)
+        features.update(upset_feats)
 
-        # 13. Build categorical values
+        # 14. Build categorical values
         features["Surface"] = surface
         features["tourney_level"] = self._map_tournament_level(tournament)
         features["indoor"] = "0"  # outdoor by default
 
-        # 14. Predict — build feature vector manually
+        # 15. Predict — build feature vector manually
         bp = self._base_predictor
         models = bp.models.get(best_of)
         if models is None:
@@ -1523,7 +1517,7 @@ class UpsetLivePredictor:
             "_raw_probability": round(raw_p, 4),
         }
 
-        # 15. Build rich output
+        # 16. Build rich output
         underdog = p1 if p1_is_underdog else p2
         favorite = p2 if p1_is_underdog else p1
 
@@ -1633,19 +1627,19 @@ class UpsetLivePredictor:
         else:
             p1_is_underdog = odds1 > odds2
 
-        # Apply perspective normalization to the feature vector
+        # Compute upset features BEFORE normalization (same as training pipeline)
+        feat_dict_raw = {c: float(num_vals[i]) for i, c in enumerate(base_num_cols)}
+        upset_feats = self._compute_upset_features_single(
+            feat_dict_raw, rank1, rank2, odds1, odds2,
+        )
+
+        # Apply perspective normalization to the 188 base features
         if not p1_is_underdog:
             vec = num_vals.reshape(1, -1)
             vec_swapped = apply_swap(vec, self._swap_perm, self._swap_sign)
             num_vals = vec_swapped[0]
 
         X_num = bp.scaler.transform(num_vals.reshape(1, -1)).astype(np.float32)
-
-        # Compute the 11 upset features from the (now normalized) base features
-        feat_dict = {c: float(num_vals[i]) for i, c in enumerate(base_num_cols)}
-        upset_feats = self._compute_upset_features_single(
-            feat_dict, rank1, rank2, odds1, odds2,
-        )
 
         # Build upset feature vector
         upset_feat_names = bp.scaler.upset_features_
